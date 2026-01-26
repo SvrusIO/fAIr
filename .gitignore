@@ -11,6 +11,9 @@ next_steps/
 ROADMAP.md
 TEST_REVIEW_REPORT.md
 SECURITY_SCAN_RESULTS.md
+RELEASE.md
+docs/VERSIONING.md
+docs/DEPLOYMENT_ASSESSMENT.md
 
 # Documentation build artifacts
 docs/_build/
