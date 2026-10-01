@@ -1,0 +1,126 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # Trigger on version tags like v0.5.1
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 0.5.4)'
+        required: true
+        type: string
+      pypi_repository:
+        description: 'PyPI repository (pypi or testpypi)'
+        required: false
+        default: 'pypi'
+        type: choice
+        options:
+          - pypi
+          - testpypi
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write  # For PyPI trusted publishing
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for tags
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION=${GITHUB_REF#refs/tags/v}
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Extracted version: $VERSION"
+
+      - name: Determine PyPI repository
+        id: pypi_repo
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            REPO="${{ github.event.inputs.pypi_repository }}"
+          else
+            # Publish to production PyPI when pushing version tags
+            REPO="pypi"
+          fi
+          echo "repository=$REPO" >> $GITHUB_OUTPUT
+          echo "Using PyPI repository: $REPO"
+
+      - name: Verify version in pyproject.toml
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          if ! grep -q "version = \"$VERSION\"" pyproject.toml; then
+            echo "Error: Version $VERSION not found in pyproject.toml"
+            exit 1
+          fi
+          echo "Version $VERSION verified in pyproject.toml"
+
+      - name: Build distribution packages
+        run: |
+          python -m build
+
+      - name: Check package
+        run: |
+          twine check dist/*
+
+      - name: Publish to TestPyPI
+        if: steps.pypi_repo.outputs.repository == 'testpypi'
+        id: testpypi_publish
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.TESTPYPI_API_TOKEN }}
+        run: |
+          twine upload --repository testpypi dist/*
+        continue-on-error: true
+
+      - name: Publish to Production PyPI
+        if: steps.pypi_repo.outputs.repository == 'pypi'
+        id: production_pypi_publish
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          twine upload dist/*
+        continue-on-error: true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Release v${{ steps.version.outputs.version }}
+          body: |
+            ## Release v${{ steps.version.outputs.version }}
+            
+            See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for full details.
+            
+            ### PyPI Status
+            ${{ steps.pypi_repo.outputs.repository == 'testpypi' && (steps.testpypi_publish.outcome == 'success' && '✅ Published to TestPyPI' || '⚠️ TestPyPI publication failed or skipped') || (steps.production_pypi_publish.outcome == 'success' && '✅ Published to PyPI' || '⚠️ PyPI publication failed or skipped') }}
+            
+            ${{ steps.pypi_repo.outputs.repository == 'testpypi' && format('📦 TestPyPI: https://test.pypi.org/project/fairpipe/{0}/', steps.version.outputs.version) || format('📦 PyPI: https://pypi.org/project/fairpipe/{0}/', steps.version.outputs.version) }}
+            
+            ### Quick Links
+            - [Documentation](https://github.com/${{ github.repository }}#readme)
+            - [Installation](https://github.com/${{ github.repository }}#installation)
+            - [Changelog](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md)
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

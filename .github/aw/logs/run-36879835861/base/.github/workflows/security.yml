@@ -1,0 +1,104 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sunday
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade "pip>=25.3"
+          pip install pip-audit
+          pip install -e .[dev] -r requirements.txt
+
+      - name: Run security scan
+        run: |
+          pip-audit --desc --format json --output security_report.json || true
+
+      - name: Upload security report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-report
+          path: security_report.json
+          retention-days: 30
+
+      - name: Check for high/critical vulnerabilities
+        run: |
+          # Run pip-audit and check for high/critical vulnerabilities
+          pip-audit --desc --format json --output /tmp/audit.json || true
+          # Check if any high or critical vulnerabilities exist
+          python << 'EOF'
+          import json
+          import sys
+          
+          try:
+              with open('/tmp/audit.json', 'r') as f:
+                  data = json.load(f)
+              
+              high_critical_vulns = []
+              for dep in data.get('dependencies', []):
+                  for vuln in dep.get('vulnerabilities', []):
+                      severity = vuln.get('severity', '').upper()
+                      if severity in ['HIGH', 'CRITICAL']:
+                          high_critical_vulns.append({
+                              'package': dep.get('name', 'unknown'),
+                              'vulnerability': vuln.get('id', 'unknown'),
+                              'severity': severity
+                          })
+              
+              if high_critical_vulns:
+                  print("❌ Found high or critical vulnerabilities:")
+                  for v in high_critical_vulns:
+                      print(f"  - {v['package']}: {v['vulnerability']} ({v['severity']})")
+                  sys.exit(1)
+              else:
+                  print("✅ No high or critical vulnerabilities found")
+                  sys.exit(0)
+          except FileNotFoundError:
+              print("⚠️ Audit file not found, running pip-audit to check...")
+              import subprocess
+              result = subprocess.run(['pip-audit', '--desc'], capture_output=True, text=True)
+              if 'HIGH' in result.stdout or 'CRITICAL' in result.stdout:
+                  print("❌ Found high or critical vulnerabilities in output")
+                  print(result.stdout)
+                  sys.exit(1)
+              sys.exit(0)
+          except Exception as e:
+              print(f"⚠️ Error checking vulnerabilities: {e}")
+              # Fallback: run pip-audit and check output
+              import subprocess
+              result = subprocess.run(['pip-audit', '--desc'], capture_output=True, text=True)
+              if result.returncode != 0 or 'HIGH' in result.stdout or 'CRITICAL' in result.stdout:
+                  print("❌ Potential high or critical vulnerabilities detected")
+                  print(result.stdout)
+                  sys.exit(1)
+              sys.exit(0)
+          EOF
+
+      - name: Generate security scan summary
+        if: always()
+        run: |
+          echo "## Security Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f security_report.json ]; then
+            echo "Security scan completed. See artifacts for full report." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Security scan failed to generate report." >> $GITHUB_STEP_SUMMARY
+          fi

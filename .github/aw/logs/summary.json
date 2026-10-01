@@ -1,0 +1,744 @@
+{
+  "summary": {
+    "total_runs": 1,
+    "total_duration": "7.9m",
+    "total_aic": 97.86921,
+    "total_tokens": 14674,
+    "total_action_minutes": 8,
+    "total_turns": 0,
+    "total_errors": 0,
+    "total_warnings": 0,
+    "total_missing_tools": 0,
+    "total_missing_data": 0,
+    "total_safe_items": 1,
+    "total_driver_exit_failures": 0,
+    "total_agent_logic_failures": 0,
+    "total_episodes": 1,
+    "high_confidence_episodes": 0,
+    "total_github_api_calls": 8,
+    "engine_counts": {
+      "claude": 1
+    }
+  },
+  "runs": [
+    {
+      "run_id": 36879835861,
+      "number": 1,
+      "workflow_name": "fairpipe CI doctor",
+      "workflow_path": ".github/workflows/ci-doctor.lock.yml",
+      "agent": "claude",
+      "engine": "Claude Code",
+      "engine_id": "claude",
+      "status": "completed",
+      "conclusion": "success",
+      "classification": "baseline",
+      "duration": "7.9m",
+      "action_minutes": 8,
+      "token_usage": 14674,
+      "aic": 97.86921,
+      "ambient_context": {
+        "input_tokens": 5987,
+        "cached_tokens": 0
+      },
+      "working_set": {
+        "measurement_state": "measured",
+        "rebuild_factor": 1.004008685485218,
+        "cumulative_input_tokens": 6011,
+        "peak_input_tokens": 5987,
+        "rebuild_excess_tokens": 24,
+        "invocations": 13
+      },
+      "safe_items_count": 1,
+      "created_at": "2026-10-01T14:52:46Z",
+      "started_at": "2026-10-01T14:52:46Z",
+      "updated_at": "2026-10-01T15:00:38Z",
+      "url": "https://github.com/JobCollins/fairness_pipeline_dev_toolkit/actions/runs/36879835861",
+      "logs_path": ".github/aw/logs/run-36879835861",
+      "event": "workflow_run",
+      "branch": "main",
+      "head_sha": "f88a1126ea5c9be16a585e298100f1659739ecca",
+      "display_title": "fairpipe CI doctor",
+      "repository": "JobCollins/fairness_pipeline_dev_toolkit",
+      "organization": "JobCollins",
+      "ref": "refs/heads/main",
+      "sha": "f88a1126ea5c9be16a585e298100f1659739ecca",
+      "actor": "JobCollins",
+      "run_attempt": "1",
+      "event_name": "workflow_run",
+      "comparison": {
+        "baseline_found": false
+      },
+      "task_domain": {
+        "name": "general_automation",
+        "label": "General Automation",
+        "reason": "The run does not strongly match a narrower workflow domain yet."
+      },
+      "behavior_fingerprint": {
+        "execution_style": "directed",
+        "tool_breadth": "narrow",
+        "actuation_style": "selective_write",
+        "resource_profile": "moderate",
+        "dispatch_mode": "standalone",
+        "agentic_fraction": 0
+      },
+      "token_usage_summary": {
+        "total_input_tokens": 6011,
+        "total_output_tokens": 8663,
+        "total_cache_read_tokens": 1208247,
+        "total_cache_write_tokens": 124864,
+        "total_requests": 13,
+        "total_duration_ms": 102237,
+        "total_response_bytes": 45530,
+        "cache_efficiency": 0,
+        "total_aic": 97.86921,
+        "ambient_context": {
+          "input_tokens": 5987,
+          "cached_tokens": 0
+        },
+        "by_model": {
+          "claude-sonnet-5": {
+            "provider": "anthropic",
+            "input_tokens": 6011,
+            "output_tokens": 8663,
+            "cache_read_tokens": 1208247,
+            "cache_write_tokens": 124864,
+            "requests": 13,
+            "duration_ms": 102237,
+            "response_bytes": 45530,
+            "aic": 97.86921000000001
+          }
+        }
+      },
+      "github_api_calls": 8,
+      "safe_outputs": [
+        {
+          "type": "create_issue",
+          "url": "https://github.com/JobCollins/fairness_pipeline_dev_toolkit/issues/49",
+          "number": 49,
+          "repo": "JobCollins/fairness_pipeline_dev_toolkit",
+          "provider": "github",
+          "id": 5664292036,
+          "target": {
+            "number": 49,
+            "provider": "github",
+            "repository": "JobCollins/fairness_pipeline_dev_toolkit"
+          },
+          "temporaryId": "aw_LJbJTQUT",
+          "metadata": {
+            "node_id": "I_kwDOQIe6q88AAAABUZ48xA"
+          },
+          "timestamp": "2026-10-01T14:59:43.945Z"
+        }
+      ],
+      "download_duration_ms": 7343,
+      "download_size_bytes": 552211
+    }
+  ],
+  "episodes": [
+    {
+      "episode_id": "workflow_run:36879835861",
+      "kind": "workflow_run",
+      "confidence": "low",
+      "reasons": [
+        "event=workflow_run",
+        "upstream run metadata unavailable in logs summary"
+      ],
+      "root_run_id": 36879835861,
+      "run_ids": [
+        36879835861
+      ],
+      "workflow_names": [
+        "fairpipe CI doctor"
+      ],
+      "primary_workflow": "fairpipe CI doctor",
+      "total_runs": 1,
+      "total_tokens": 14674,
+      "total_aic": 97.86921,
+      "total_duration": "7.9m",
+      "risky_node_count": 0,
+      "changed_node_count": 0,
+      "write_capable_node_count": 1,
+      "missing_tool_count": 0,
+      "mcp_failure_count": 0,
+      "blocked_request_count": 0,
+      "latest_success_fallback_count": 0,
+      "new_mcp_failure_run_count": 0,
+      "blocked_request_increase_run_count": 0,
+      "resource_heavy_node_count": 0,
+      "poor_control_node_count": 0,
+      "risk_distribution": "none",
+      "escalation_eligible": false,
+      "suggested_route": "workflow:fairpipe CI doctor",
+      "repository": "JobCollins/fairness_pipeline_dev_toolkit",
+      "organization": "JobCollins",
+      "tool_calls": [
+        {
+          "tool": "actions_list",
+          "server": "github",
+          "tokens": 29,
+          "duration_ms": 0,
+          "status": "incomplete"
+        },
+        {
+          "tool": "get_job_logs",
+          "server": "github",
+          "tokens": 30,
+          "duration_ms": 0,
+          "status": "incomplete"
+        },
+        {
+          "tool": "get_job_logs",
+          "server": "github",
+          "tokens": 30,
+          "duration_ms": 0,
+          "status": "incomplete"
+        },
+        {
+          "tool": "get_job_logs",
+          "server": "github",
+          "tokens": 30,
+          "duration_ms": 0,
+          "status": "incomplete"
+        },
+        {
+          "tool": "issue_read",
+          "server": "github",
+          "tokens": 24,
+          "duration_ms": 0,
+          "status": "incomplete"
+        },
+        {
+          "tool": "issue_read",
+          "server": "github",
+          "tokens": 24,
+          "duration_ms": 0,
+          "status": "incomplete"
+        },
+        {
+          "tool": "issue_read",
+          "server": "github",
+          "tokens": 24,
+          "duration_ms": 0,
+          "status": "incomplete"
+        },
+        {
+          "tool": "issue_read",
+          "server": "github",
+          "tokens": 24,
+          "duration_ms": 0,
+          "status": "incomplete"
+        },
+        {
+          "tool": "issue_read",
+          "server": "github",
+          "tokens": 24,
+          "duration_ms": 0,
+          "status": "incomplete"
+        },
+        {
+          "tool": "issue_read",
+          "server": "github",
+          "tokens": 24,
+          "duration_ms": 0,
+          "status": "incomplete"
+        },
+        {
+          "tool": "issue_read",
+          "server": "github",
+          "tokens": 24,
+          "duration_ms": 0,
+          "status": "incomplete"
+        },
+        {
+          "tool": "issue_read",
+          "server": "github",
+          "tokens": 24,
+          "duration_ms": 0,
+          "status": "incomplete"
+        },
+        {
+          "tool": "issue_read",
+          "server": "github",
+          "tokens": 24,
+          "duration_ms": 0,
+          "status": "incomplete"
+        },
+        {
+          "tool": "issue_read",
+          "server": "github",
+          "tokens": 24,
+          "duration_ms": 0,
+          "status": "incomplete"
+        },
+        {
+          "tool": "issue_read",
+          "server": "github",
+          "tokens": 24,
+          "duration_ms": 0,
+          "status": "incomplete"
+        },
+        {
+          "tool": "issue_read",
+          "server": "github",
+          "tokens": 24,
+          "duration_ms": 0,
+          "status": "incomplete"
+        },
+        {
+          "tool": "issue_read",
+          "server": "github",
+          "tokens": 24,
+          "duration_ms": 0,
+          "status": "incomplete"
+        },
+        {
+          "tool": "issue_read",
+          "server": "github",
+          "tokens": 24,
+          "duration_ms": 0,
+          "status": "incomplete"
+        },
+        {
+          "tool": "issue_read",
+          "server": "github",
+          "tokens": 24,
+          "duration_ms": 0,
+          "status": "incomplete"
+        },
+        {
+          "tool": "issue_read",
+          "server": "github",
+          "tokens": 24,
+          "duration_ms": 0,
+          "status": "incomplete"
+        },
+        {
+          "tool": "issue_read",
+          "server": "github",
+          "tokens": 24,
+          "duration_ms": 0,
+          "status": "incomplete"
+        },
+        {
+          "tool": "issue_read",
+          "server": "github",
+          "tokens": 24,
+          "duration_ms": 0,
+          "status": "incomplete"
+        },
+        {
+          "tool": "list_issues",
+          "server": "github",
+          "tokens": 26,
+          "duration_ms": 0,
+          "status": "incomplete"
+        },
+        {
+          "tool": "search_issues",
+          "server": "github",
+          "tokens": 36,
+          "duration_ms": 0,
+          "status": "incomplete"
+        },
+        {
+          "tool": "search_repositories",
+          "server": "github",
+          "tokens": 17,
+          "duration_ms": 0,
+          "status": "incomplete"
+        },
+        {
+          "tool": "create_issue",
+          "server": "safeoutputs",
+          "tokens": 1032,
+          "duration_ms": 0,
+          "status": "incomplete"
+        }
+      ]
+    }
+  ],
+  "edges": [],
+  "mcp_tool_usage": {
+    "summary": [
+      {
+        "server_name": "github",
+        "tool_name": "actions_list",
+        "call_count": 1,
+        "total_input_size": 119,
+        "total_output_size": 0,
+        "max_input_size": 119,
+        "max_output_size": 0
+      },
+      {
+        "server_name": "github",
+        "tool_name": "get_job_logs",
+        "call_count": 3,
+        "total_input_size": 368,
+        "total_output_size": 0,
+        "max_input_size": 123,
+        "max_output_size": 0
+      },
+      {
+        "server_name": "github",
+        "tool_name": "issue_read",
+        "call_count": 18,
+        "total_input_size": 1728,
+        "total_output_size": 0,
+        "max_input_size": 96,
+        "max_output_size": 0
+      },
+      {
+        "server_name": "github",
+        "tool_name": "list_issues",
+        "call_count": 1,
+        "total_input_size": 104,
+        "total_output_size": 0,
+        "max_input_size": 104,
+        "max_output_size": 0
+      },
+      {
+        "server_name": "github",
+        "tool_name": "search_issues",
+        "call_count": 1,
+        "total_input_size": 145,
+        "total_output_size": 0,
+        "max_input_size": 145,
+        "max_output_size": 0
+      },
+      {
+        "server_name": "github",
+        "tool_name": "search_repositories",
+        "call_count": 1,
+        "total_input_size": 70,
+        "total_output_size": 0,
+        "max_input_size": 70,
+        "max_output_size": 0
+      },
+      {
+        "server_name": "safeoutputs",
+        "tool_name": "create_issue",
+        "call_count": 1,
+        "total_input_size": 4130,
+        "total_output_size": 0,
+        "max_input_size": 4130,
+        "max_output_size": 0
+      }
+    ],
+    "servers": [
+      {
+        "server_name": "github",
+        "tool_call_count": 25,
+        "request_count": 25,
+        "total_input_size": 2534,
+        "total_output_size": 0
+      },
+      {
+        "server_name": "safeoutputs",
+        "tool_call_count": 1,
+        "request_count": 1,
+        "total_input_size": 4130,
+        "total_output_size": 0
+      }
+    ],
+    "tool_calls": [
+      {
+        "tool_call_id": "call-1",
+        "timestamp": "2026-10-01T14:55:26.964Z",
+        "server_name": "github",
+        "tool_name": "search_repositories",
+        "input_size": 70,
+        "output_size": 0,
+        "status": "incomplete"
+      },
+      {
+        "tool_call_id": "call-2",
+        "timestamp": "2026-10-01T14:55:27.818Z",
+        "server_name": "github",
+        "tool_name": "actions_list",
+        "input_size": 119,
+        "output_size": 0,
+        "status": "incomplete"
+      },
+      {
+        "tool_call_id": "call-3",
+        "timestamp": "2026-10-01T14:55:33.913Z",
+        "server_name": "github",
+        "tool_name": "get_job_logs",
+        "input_size": 122,
+        "output_size": 0,
+        "status": "incomplete"
+      },
+      {
+        "tool_call_id": "call-4",
+        "timestamp": "2026-10-01T14:56:05.264Z",
+        "server_name": "github",
+        "tool_name": "get_job_logs",
+        "input_size": 123,
+        "output_size": 0,
+        "status": "incomplete"
+      },
+      {
+        "tool_call_id": "call-5",
+        "timestamp": "2026-10-01T14:56:21.791Z",
+        "server_name": "github",
+        "tool_name": "get_job_logs",
+        "input_size": 123,
+        "output_size": 0,
+        "status": "incomplete"
+      },
+      {
+        "tool_call_id": "call-6",
+        "timestamp": "2026-10-01T14:56:41.512Z",
+        "server_name": "github",
+        "tool_name": "search_issues",
+        "input_size": 145,
+        "output_size": 0,
+        "status": "incomplete"
+      },
+      {
+        "tool_call_id": "call-7",
+        "timestamp": "2026-10-01T14:56:42.282Z",
+        "server_name": "github",
+        "tool_name": "list_issues",
+        "input_size": 104,
+        "output_size": 0,
+        "status": "incomplete"
+      },
+      {
+        "tool_call_id": "call-8",
+        "timestamp": "2026-10-01T14:56:43.110Z",
+        "server_name": "github",
+        "tool_name": "issue_read",
+        "input_size": 96,
+        "output_size": 0,
+        "status": "incomplete"
+      },
+      {
+        "tool_call_id": "call-9",
+        "timestamp": "2026-10-01T14:56:43.830Z",
+        "server_name": "github",
+        "tool_name": "issue_read",
+        "input_size": 96,
+        "output_size": 0,
+        "status": "incomplete"
+      },
+      {
+        "tool_call_id": "call-10",
+        "timestamp": "2026-10-01T14:56:44.495Z",
+        "server_name": "github",
+        "tool_name": "issue_read",
+        "input_size": 96,
+        "output_size": 0,
+        "status": "incomplete"
+      },
+      {
+        "tool_call_id": "call-11",
+        "timestamp": "2026-10-01T14:56:45.446Z",
+        "server_name": "github",
+        "tool_name": "issue_read",
+        "input_size": 96,
+        "output_size": 0,
+        "status": "incomplete"
+      },
+      {
+        "tool_call_id": "call-12",
+        "timestamp": "2026-10-01T14:56:46.099Z",
+        "server_name": "github",
+        "tool_name": "issue_read",
+        "input_size": 96,
+        "output_size": 0,
+        "status": "incomplete"
+      },
+      {
+        "tool_call_id": "call-13",
+        "timestamp": "2026-10-01T14:56:47.038Z",
+        "server_name": "github",
+        "tool_name": "issue_read",
+        "input_size": 96,
+        "output_size": 0,
+        "status": "incomplete"
+      },
+      {
+        "tool_call_id": "call-14",
+        "timestamp": "2026-10-01T14:56:47.929Z",
+        "server_name": "github",
+        "tool_name": "issue_read",
+        "input_size": 96,
+        "output_size": 0,
+        "status": "incomplete"
+      },
+      {
+        "tool_call_id": "call-15",
+        "timestamp": "2026-10-01T14:56:48.497Z",
+        "server_name": "github",
+        "tool_name": "issue_read",
+        "input_size": 96,
+        "output_size": 0,
+        "status": "incomplete"
+      },
+      {
+        "tool_call_id": "call-16",
+        "timestamp": "2026-10-01T14:56:49.164Z",
+        "server_name": "github",
+        "tool_name": "issue_read",
+        "input_size": 96,
+        "output_size": 0,
+        "status": "incomplete"
+      },
+      {
+        "tool_call_id": "call-17",
+        "timestamp": "2026-10-01T14:56:49.684Z",
+        "server_name": "github",
+        "tool_name": "issue_read",
+        "input_size": 96,
+        "output_size": 0,
+        "status": "incomplete"
+      },
+      {
+        "tool_call_id": "call-18",
+        "timestamp": "2026-10-01T14:56:50.276Z",
+        "server_name": "github",
+        "tool_name": "issue_read",
+        "input_size": 96,
+        "output_size": 0,
+        "status": "incomplete"
+      },
+      {
+        "tool_call_id": "call-19",
+        "timestamp": "2026-10-01T14:56:51.294Z",
+        "server_name": "github",
+        "tool_name": "issue_read",
+        "input_size": 96,
+        "output_size": 0,
+        "status": "incomplete"
+      },
+      {
+        "tool_call_id": "call-20",
+        "timestamp": "2026-10-01T14:56:51.853Z",
+        "server_name": "github",
+        "tool_name": "issue_read",
+        "input_size": 96,
+        "output_size": 0,
+        "status": "incomplete"
+      },
+      {
+        "tool_call_id": "call-21",
+        "timestamp": "2026-10-01T14:56:52.772Z",
+        "server_name": "github",
+        "tool_name": "issue_read",
+        "input_size": 96,
+        "output_size": 0,
+        "status": "incomplete"
+      },
+      {
+        "tool_call_id": "call-22",
+        "timestamp": "2026-10-01T14:56:53.278Z",
+        "server_name": "github",
+        "tool_name": "issue_read",
+        "input_size": 96,
+        "output_size": 0,
+        "status": "incomplete"
+      },
+      {
+        "tool_call_id": "call-23",
+        "timestamp": "2026-10-01T14:56:53.858Z",
+        "server_name": "github",
+        "tool_name": "issue_read",
+        "input_size": 96,
+        "output_size": 0,
+        "status": "incomplete"
+      },
+      {
+        "tool_call_id": "call-24",
+        "timestamp": "2026-10-01T14:56:54.465Z",
+        "server_name": "github",
+        "tool_name": "issue_read",
+        "input_size": 96,
+        "output_size": 0,
+        "status": "incomplete"
+      },
+      {
+        "tool_call_id": "call-25",
+        "timestamp": "2026-10-01T14:56:55.277Z",
+        "server_name": "github",
+        "tool_name": "issue_read",
+        "input_size": 96,
+        "output_size": 0,
+        "status": "incomplete"
+      },
+      {
+        "tool_call_id": "call-26",
+        "timestamp": "2026-10-01T14:57:18.625Z",
+        "server_name": "safeoutputs",
+        "tool_name": "create_issue",
+        "input_size": 4130,
+        "output_size": 0,
+        "status": "incomplete"
+      }
+    ]
+  },
+  "observability_insights": [
+    {
+      "category": "actuation",
+      "severity": "info",
+      "title": "Actuation mix summarized",
+      "summary": "Across 1 run(s), 1 executed write-capable safe outputs and 0 stayed read-only.",
+      "evidence": "write_runs=1 read_only_runs=0"
+    },
+    {
+      "category": "execution",
+      "severity": "info",
+      "title": "Cross-run log template patterns",
+      "summary": "Mined 2 distinct event templates across 6 pipeline stages from 1 events in 1 runs.",
+      "evidence": "finish=1 plan=1"
+    }
+  ],
+  "firewall_log": {
+    "total_requests": 42,
+    "allowed_requests": 42,
+    "blocked_requests": 0,
+    "allowed_domains": [
+      "api.anthropic.com:443"
+    ],
+    "blocked_domains": null,
+    "requests_by_domain": {
+      "api.anthropic.com:443": {
+        "allowed": 42,
+        "blocked": 0
+      }
+    },
+    "by_workflow": {
+      "fairpipe CI doctor": {
+        "allowed_domains": [
+          "api.anthropic.com:443"
+        ],
+        "total_requests": 42,
+        "allowed_requests": 42,
+        "blocked_requests": 0,
+        "requests_by_domain": {
+          "api.anthropic.com:443": {
+            "allowed": 42,
+            "blocked": 0
+          }
+        }
+      }
+    }
+  },
+  "logs_location": "/Users/jobdulo/Documents/Turing/Sprint 4/fairness_pipeline_dev_toolkit/.github/aw/logs",
+  "message": "Only the usage artifact was downloaded. Use --artifacts all to download all artifacts, or a specific set such as --artifacts agent, or combinations such as --artifacts agent,firewall.",
+  "github_api_rate_limit": {
+    "host": "github.com",
+    "start": {
+      "limit": 5000,
+      "remaining": 5000,
+      "reset": 1790879870,
+      "used": 0
+    },
+    "end": {
+      "limit": 5000,
+      "remaining": 5000,
+      "reset": 1790879881,
+      "used": 0
+    }
+  }
+}
