@@ -102,6 +102,18 @@ Read this before upgrading from ≤0.11.0.
   percentile CI path was unaffected** — published figures that used the default are
   not automatically suspect. Only callers who set BCa need to recompute.
 
+### Performance
+
+- **Analyzer bootstrap CI is now vectorised per group count.** `demographic_parity_difference`,
+  `equalized_odds_difference`, and `mae_parity_difference` computed each bootstrap
+  replicate's group means with a Python loop over groups, each doing an
+  `O(n)` boolean comparison — `O(n_groups * n)` per replicate. Group membership is
+  now encoded once per call into an integer array and each replicate uses a single
+  `np.bincount` pass, `O(n)` regardless of group count. Intersectional calls (more
+  groups) see the largest wins (~3-7x on the 100k-row benchmark); outputs are
+  unchanged (binary-metric values are bit-exact, MAE differs only at the ~1e-15
+  floating-point-summation-order level, well inside the project's `1e-12` tolerance).
+
 ### Changed (detail)
 
 - Shared `metrics/input_validation.py` for analyzer + adapters (BL-015);

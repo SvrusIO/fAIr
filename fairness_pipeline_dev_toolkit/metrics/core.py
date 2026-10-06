@@ -106,6 +106,90 @@ def mae_gap_stat_from_indices(
     return float(max(maes) - min(maes))
 
 
+def _group_codes(group_of: np.ndarray, group_keys: Sequence[str]) -> np.ndarray:
+    """Integer code in ``[0, len(group_keys))`` for each element of ``group_of``.
+
+    Elements whose value is not in ``group_keys`` (e.g. a group excluded for
+    being below ``min_group_size``, or a NaN label) get code ``-1``. Computing
+    this mapping once per bootstrap *call* (rather than once per bootstrap
+    *replicate*) is what lets the per-replicate statistic below do a single
+    vectorised pass instead of one boolean comparison per group.
+    """
+    return pd.Categorical(np.asarray(group_of), categories=list(group_keys)).codes.astype(np.int64)
+
+
+def _dpd_stat_from_codes(
+    sample_idx: np.ndarray,
+    y_pred: np.ndarray,
+    codes: np.ndarray,
+    n_groups: int,
+) -> float:
+    """Vectorised equivalent of :func:`dpd_stat_from_indices` given precomputed group codes."""
+    shifted = codes[sample_idx] + 1
+    counts = np.bincount(shifted, minlength=n_groups + 1)[1:]
+    if np.any(counts == 0):
+        return float("nan")
+    sums = np.bincount(shifted, weights=y_pred[sample_idx], minlength=n_groups + 1)[1:]
+    rates = sums / counts
+    return float(rates.max() - rates.min())
+
+
+def _eod_stat_from_codes(
+    sample_idx: np.ndarray,
+    y_true: np.ndarray,
+    y_pred: np.ndarray,
+    codes: np.ndarray,
+    n_groups: int,
+) -> float:
+    """Vectorised equivalent of :func:`eod_stat_from_indices` given precomputed group codes."""
+    shifted = codes[sample_idx] + 1
+    total_counts = np.bincount(shifted, minlength=n_groups + 1)[1:]
+    if np.any(total_counts == 0):
+        return float("nan")
+
+    yt = y_true[sample_idx]
+    yp = y_pred[sample_idx]
+    pos = yt == 1
+    neg = yt == 0
+
+    pos_counts = np.bincount(shifted[pos], minlength=n_groups + 1)[1:]
+    neg_counts = np.bincount(shifted[neg], minlength=n_groups + 1)[1:]
+    pos_pred1 = np.bincount(
+        shifted[pos], weights=(yp[pos] == 1).astype(float), minlength=n_groups + 1
+    )[1:]
+    neg_pred1 = np.bincount(
+        shifted[neg], weights=(yp[neg] == 1).astype(float), minlength=n_groups + 1
+    )[1:]
+
+    with np.errstate(invalid="ignore", divide="ignore"):
+        tprs = np.where(pos_counts > 0, pos_pred1 / pos_counts, np.nan)
+        fprs = np.where(neg_counts > 0, neg_pred1 / neg_counts, np.nan)
+
+    tpr_finite = tprs[np.isfinite(tprs)]
+    fpr_finite = fprs[np.isfinite(fprs)]
+    tpr_gap = float("nan") if tpr_finite.size < 2 else float(tpr_finite.max() - tpr_finite.min())
+    fpr_gap = float("nan") if fpr_finite.size < 2 else float(fpr_finite.max() - fpr_finite.min())
+    if not np.isfinite(tpr_gap) and not np.isfinite(fpr_gap):
+        return float("nan")
+    return float(np.nanmax([tpr_gap, fpr_gap]))
+
+
+def _mae_stat_from_codes(
+    sample_idx: np.ndarray,
+    abs_err: np.ndarray,
+    codes: np.ndarray,
+    n_groups: int,
+) -> float:
+    """Vectorised equivalent of :func:`mae_gap_stat_from_indices` given precomputed group codes."""
+    shifted = codes[sample_idx] + 1
+    counts = np.bincount(shifted, minlength=n_groups + 1)[1:]
+    if np.any(counts == 0):
+        return float("nan")
+    sums = np.bincount(shifted, weights=abs_err[sample_idx], minlength=n_groups + 1)[1:]
+    maes = sums / counts
+    return float(maes.max() - maes.min())
+
+
 @dataclass
 class Result:
     metric: str
@@ -290,10 +374,12 @@ class FairnessAnalyzer:
                 )
             group_keys = [str(g) for g in groups]
             group_of = _sens_keys(sens)
+            codes = _group_codes(group_of, group_keys)
+            n_groups = len(group_keys)
             obs_idx = np.arange(len(yp), dtype=int)
 
             def stat_fn(sample_idx):
-                return dpd_stat_from_indices(sample_idx, yp, group_of, group_keys)
+                return _dpd_stat_from_codes(sample_idx, yp, codes, n_groups)
 
             res.ci = bootstrap_ci(obs_idx, stat_fn, B=ci_samples, level=ci_level, method=ci_method)
 
@@ -397,10 +483,12 @@ class FairnessAnalyzer:
                 )
             group_keys = [str(g) for g in groups]
             group_of = _sens_keys(sens)
+            codes = _group_codes(group_of, group_keys)
+            n_groups = len(group_keys)
             obs_idx = np.arange(len(yp), dtype=int)
 
             def stat_fn(sample_idx):
-                return eod_stat_from_indices(sample_idx, yt, yp, group_of, group_keys)
+                return _eod_stat_from_codes(sample_idx, yt, yp, codes, n_groups)
 
             res.ci = bootstrap_ci(obs_idx, stat_fn, B=ci_samples, level=ci_level, method=ci_method)
 
@@ -497,10 +585,12 @@ class FairnessAnalyzer:
                 )
             group_keys = [str(g) for g in groups]
             group_of = _sens_keys(sens)
+            codes = _group_codes(group_of, group_keys)
+            n_groups = len(group_keys)
             obs_idx = np.arange(len(yp), dtype=int)
 
             def stat_fn(sample_idx):
-                return mae_gap_stat_from_indices(sample_idx, abs_err, group_of, group_keys)
+                return _mae_stat_from_codes(sample_idx, abs_err, codes, n_groups)
 
             res.ci = bootstrap_ci(obs_idx, stat_fn, B=ci_samples, level=ci_level, method=ci_method)
 
