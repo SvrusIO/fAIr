@@ -42,10 +42,22 @@ def build_intersectional_labels(
     if include_na:
         # Replace NaN with string "NaN" for labeling
         df = df.fillna("NaN")
-        labels = df.astype(str).agg(sep.join, axis=1)
+        str_df = df.astype(str)
+        has_na = False
     else:
         # will introduce NaNs where any attribute is NaN
-        labels = df.astype("string").agg(sep.join, axis=1)
+        str_df = df.astype("string")
+        has_na = bool(len(str_df)) and bool(str_df.isna().to_numpy().any())
+
+    if len(df) == 0 or has_na:
+        # Row-wise fallback: preserves the pandas quirk where `.agg` on a
+        # 0-row frame returns a DataFrame (not a Series), and the TypeError
+        # that `include_na=False` must raise on any NaN (vectorized
+        # `str.cat` would otherwise silently drop such rows via `na_rep`).
+        labels = str_df.agg(sep.join, axis=1)
+    else:
+        first, *rest = [str_df[c] for c in columns]
+        labels = first.str.cat(rest, sep=sep) if rest else first.copy()
 
     return labels.astype("category")
 

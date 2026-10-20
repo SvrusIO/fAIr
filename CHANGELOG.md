@@ -1,5 +1,16 @@
 ## [Unreleased]
 
+### Changed
+
+- **Performance**: `build_intersectional_labels` (used by every
+  `intersectional=True` metric call) now builds labels with a vectorized
+  `Series.str.cat` chain instead of a row-wise `.agg(sep.join, axis=1)` call,
+  up to ~22x faster on 100k-row intersectional inputs. The two edge cases
+  where the fast path isn't exactly equivalent (an empty DataFrame, and
+  `include_na=False` with any NaN present) still use the original row-wise
+  code, so outputs are byte-for-byte identical in all cases. No public API or
+  numeric output change.
+
 ## [v0.12.0] — 2026-10-06
 
 ### Upgrade notes (breaking)
