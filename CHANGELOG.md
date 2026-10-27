@@ -1,5 +1,16 @@
 ## [Unreleased]
 
+### Performance
+
+- `build_intersectional_labels` (used by every intersectional metric call)
+  now builds the combined group label with a vectorized `Series.str.cat`
+  instead of a row-wise `DataFrame.agg(..., axis=1)`, ~8-10x faster on
+  100k-row intersectional `demographic_parity_difference` /
+  `equalized_odds_difference` benchmarks. Falls back to the original
+  row-wise path for empty frames and for `include_na=False` rows containing
+  NaN, so output (including the existing `TypeError` on NaN in that mode) is
+  unchanged — see `tests/utils/test_intersectional.py::TestBuildIntersectionalLabelsEquivalence`.
+
 ## [v0.12.0] — 2026-10-06
 
 ### Upgrade notes (breaking)

@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
+import pytest
 
 from fairness_pipeline_dev_toolkit.utils.intersectional import (
     build_intersectional_labels,
@@ -144,6 +145,126 @@ class TestBuildIntersectionalLabels:
 
         assert len(labels) == 2
         assert "NaN" in str(labels.iloc[0])
+
+
+def _reference_build_intersectional_labels(
+    attrs_df: pd.DataFrame,
+    columns=None,
+    sep: str = "||",
+    include_na: bool = True,
+):
+    """Row-wise reference implementation (pre-optimization) of
+    ``build_intersectional_labels``, used to pin the vectorized version to
+    identical output across edge cases."""
+    if columns is None:
+        columns = list(attrs_df.columns)
+    df = attrs_df[columns].copy()
+    if include_na:
+        df = df.fillna("NaN")
+        labels = df.astype(str).agg(sep.join, axis=1)
+    else:
+        labels = df.astype("string").agg(sep.join, axis=1)
+    return labels.astype("category")
+
+
+class TestBuildIntersectionalLabelsEquivalence:
+    """Pin the vectorized ``build_intersectional_labels`` to the original
+    row-wise implementation across edge cases (perf optimization safety net).
+    """
+
+    def _assert_matches_reference(self, df, **kwargs):
+        expected = _reference_build_intersectional_labels(df.copy(), **kwargs)
+        actual = build_intersectional_labels(df.copy(), **kwargs)
+        assert actual.equals(
+            expected
+        ), f"mismatch for kwargs={kwargs}: expected={expected!r}, actual={actual!r}"
+
+    def test_empty_group_include_na_true(self):
+        df = pd.DataFrame({"race": [], "gender": []})
+        self._assert_matches_reference(df, include_na=True)
+
+    def test_empty_group_include_na_false(self):
+        df = pd.DataFrame({"race": [], "gender": []})
+        self._assert_matches_reference(df, include_na=False)
+
+    def test_single_row_group(self):
+        df = pd.DataFrame({"race": ["A"], "gender": ["M"]})
+        self._assert_matches_reference(df, include_na=True)
+        self._assert_matches_reference(df, include_na=False)
+
+    def test_nan_group_values_include_na_true(self):
+        df = pd.DataFrame(
+            {
+                "race": ["A", "B", np.nan, "D", np.nan],
+                "gender": ["M", "F", "M", np.nan, np.nan],
+            }
+        )
+        self._assert_matches_reference(df, include_na=True)
+
+    def test_nan_group_values_include_na_false_raises_like_reference(self):
+        df = pd.DataFrame(
+            {
+                "race": ["A", "B", np.nan, "D"],
+                "gender": ["M", "F", "M", np.nan],
+            }
+        )
+        try:
+            _reference_build_intersectional_labels(df.copy(), include_na=False)
+        except Exception as exc:  # pragma: no cover - documents current behavior
+            expected_exc = type(exc)
+        else:
+            expected_exc = None
+
+        if expected_exc is None:
+            self._assert_matches_reference(df, include_na=False)
+        else:
+            with pytest.raises(expected_exc):
+                build_intersectional_labels(df.copy(), include_na=False)
+
+    def test_intersectional_three_columns(self):
+        rng = np.random.default_rng(11)
+        n = 500
+        df = pd.DataFrame(
+            {
+                "race": rng.choice(["A", "B", "C", "D", "E"], size=n),
+                "gender": rng.choice(["M", "F"], size=n),
+                "age_group": rng.choice(["<30", "30-50", "50+"], size=n),
+            }
+        )
+        self._assert_matches_reference(df, include_na=True)
+        self._assert_matches_reference(df, include_na=False)
+
+    def test_intersectional_with_some_nan_include_na_true(self):
+        rng = np.random.default_rng(12)
+        n = 500
+        race = rng.choice(["A", "B", "C"], size=n).astype(object)
+        gender = rng.choice(["M", "F"], size=n).astype(object)
+        nan_mask = rng.random(n) < 0.1
+        race[nan_mask] = np.nan
+        df = pd.DataFrame({"race": race, "gender": gender})
+        self._assert_matches_reference(df, include_na=True)
+
+    def test_single_column(self):
+        df = pd.DataFrame({"group": ["A", "B", "A", "B", "C"]})
+        self._assert_matches_reference(df, include_na=True)
+        self._assert_matches_reference(df, include_na=False)
+
+    def test_numeric_column(self):
+        df = pd.DataFrame({"race": [1, 2, 3], "gender": ["M", "F", "M"]})
+        self._assert_matches_reference(df, include_na=True)
+        self._assert_matches_reference(df, include_na=False)
+
+    def test_large_scale_no_nan_matches_reference(self):
+        rng = np.random.default_rng(7)
+        n = 5_000
+        df = pd.DataFrame(
+            {
+                "race": rng.choice(["A", "B", "C", "D", "E"], size=n),
+                "gender": rng.choice(["M", "F"], size=n),
+                "age_group": rng.choice(["<30", "30-50", "50+"], size=n),
+            }
+        )
+        self._assert_matches_reference(df, include_na=False)
 
 
 class TestMinGroupMask:

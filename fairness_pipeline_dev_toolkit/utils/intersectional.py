@@ -42,10 +42,27 @@ def build_intersectional_labels(
     if include_na:
         # Replace NaN with string "NaN" for labeling
         df = df.fillna("NaN")
-        labels = df.astype(str).agg(sep.join, axis=1)
+        str_df = df.astype(str)
+        has_na = False
     else:
         # will introduce NaNs where any attribute is NaN
-        labels = df.astype("string").agg(sep.join, axis=1)
+        str_df = df.astype("string")
+        has_na = bool(df.isna().any().any())
+
+    if len(df) == 0 or len(columns) == 0 or has_na:
+        # Row-wise fallback for edge cases the column-wise concatenation below
+        # does not reproduce identically: an empty frame (``.agg`` returns the
+        # frame unchanged, not a Series) and, under include_na=False, a NaN
+        # value (``str.join`` raises TypeError on the None/NA it meets).
+        labels = str_df.agg(sep.join, axis=1)
+    else:
+        # Column-wise concatenation is equivalent to the row-wise ``.agg``
+        # above whenever no row mixes NaN with the join (checked by has_na),
+        # but is orders of magnitude faster for large DataFrames.
+        cols = [str_df[c] for c in columns]
+        labels = cols[0].str.cat(cols[1:], sep=sep)
+        labels.name = None
+        labels = labels.astype(str)
 
     return labels.astype("category")
 
